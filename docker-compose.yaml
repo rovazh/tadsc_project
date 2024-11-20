@@ -1,0 +1,41 @@
+version: '2.0'
+services:
+  db:
+    image: mongo:latest
+    environment:
+      MONGO_INITDB_ROOT_USERNAME: root
+      MONGO_INITDB_ROOT_PASSWORD: example
+    ports:
+      - "27017:27017"
+  user-api:
+    build: ./user-api
+    environment:
+      DB_URL: mongodb://root:example@db:27017
+      CLIENT_ID: ${CLIENT_ID}
+      JWKS_URI: https://cognito-idp.us-east-2.amazonaws.com/us-east-2_656eZzHT0/.well-known/jwks.json
+    depends_on:
+      - db
+    ports:
+      - "3000:3000"
+  auction-api:
+    build: auction-api
+    environment:
+      DB_URL: mongodb://root:example@db:27017
+      CLIENT_ID: ${CLIENT_ID}
+      JWKS_URI: https://cognito-idp.us-east-2.amazonaws.com/us-east-2_656eZzHT0/.well-known/jwks.json
+      USER_API_BASE_URL: http://user-api:3000
+      PAYMENT_API_BASE_URL: http://payment-api:3002
+    depends_on:
+      - db
+    ports:
+      - "3001:3001"
+  payment-api:
+    build: payment-api
+    environment:
+      CLIENT_ID: ${CLIENT_ID}
+      JWKS_URI: https://cognito-idp.us-east-2.amazonaws.com/us-east-2_656eZzHT0/.well-known/jwks.json
+      PAYPAL_CLIENT_ID: ${PAYPAL_CLIENT_ID}
+      PAYPAL_CLIENT_SECRET: ${PAYPAL_CLIENT_SECRET}
+      AUCTION_API_BASE_URL: http://auction-api:3001
+    ports:
+      - "3002:3002"

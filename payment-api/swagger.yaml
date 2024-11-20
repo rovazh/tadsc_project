@@ -1,0 +1,91 @@
+openapi: 3.0.3
+info:
+  title: Swagger Payment API
+  description: Payment API
+  version: 1.0.0
+security:
+  - Oauth: []
+paths:
+  /order:
+    post:
+      tags:
+        - Order
+      description: Create a new order
+      requestBody:
+        description: Order to create
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/Order'
+        required: true
+      responses:
+        '201':
+          $ref: '#/components/responses/Success'
+        '401':
+          $ref: '#/components/responses/Unauthenticated'
+        '400':
+          $ref: '#/components/responses/BadRequest'
+components:
+  schemas:
+    Order:
+      required:
+        - lotName
+        - price
+        - currencyCode
+      type: object
+      properties:
+        lotName:
+          type: string
+          example: A very expensive painting
+        price:
+          type: number
+          example: 10.50
+        currencyCode:
+          type: string
+          enum:
+            - USD
+    Error:
+      type: object
+      properties:
+        error:
+          type: string
+  responses:
+    Success:
+      description: Successful operation
+      content:
+        application/json:
+          schema:
+            type: object
+            properties:
+              userActionUrl:
+                type: string
+                example: https://www.sandbox.paypal.com/checkoutnow?token=1RV27769LP715051L
+              id:
+                type: string
+                example: AXC902377SDF
+    BadRequest:
+      description: Bad Request
+      content:
+        application/json:
+          schema:
+            $ref: '#/components/schemas/Error'
+    NotFound:
+      description: Not Found
+      content:
+        application/json:
+          schema:
+            $ref: '#/components/schemas/Error'
+    Unauthenticated:
+      description: Unauthenticated
+      content:
+        application/json:
+          schema:
+            $ref: '#/components/schemas/Error'
+  securitySchemes:
+    Oauth:
+      type: oauth2
+      description: API uses OAuth 2.0 with the client credentials grant flow.
+      flows:
+        clientCredentials:
+          tokenUrl: https://testtesttestm2m.auth.us-east-2.amazoncognito.com/oauth2/token
+          scopes: {}

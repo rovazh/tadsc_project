@@ -1,0 +1,320 @@
+openapi: 3.0.3
+info:
+  title: Swagger Auction API
+  description: Auction API
+  version: 1.0.0
+security:
+  - Oauth: []
+paths:
+  /lot:
+    post:
+      tags:
+        - Admin endpoints
+      description: Create a new lot
+      requestBody:
+        description: lot to create
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/Lot'
+        required: true
+      responses:
+        '200':
+          $ref: '#/components/responses/Success'
+        '401':
+          $ref: '#/components/responses/Unauthenticated'
+        '400':
+          $ref: '#/components/responses/BadRequest'
+  /lots:
+    get:
+      tags:
+        - Admin endpoints
+      description: Get all consigned lots
+      responses:
+        '200':
+          description: Successful operation
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: '#/components/schemas/Lot'
+        '401':
+          $ref: '#/components/responses/Unauthenticated'
+        '404':
+          $ref: '#/components/responses/NotFound'
+  /lot/{lotID}:
+    parameters:
+      - name: lotID
+        description: lot ID
+        in: path
+        required: true
+        schema:
+          type: string
+    get:
+      tags:
+        - Admin endpoints
+      description: Get an lot
+      responses:
+        '200':
+          $ref: '#/components/responses/Success'
+        '401':
+          $ref: '#/components/responses/Unauthenticated'
+        '404':
+          $ref: '#/components/responses/NotFound'
+    put:
+      tags:
+        - Admin endpoints
+      description: Update an lot
+      requestBody:
+        description: lot to update
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/Lot'
+        required: true
+      responses:
+        '200':
+          $ref: '#/components/responses/Success'
+        '400':
+          $ref: '#/components/responses/BadRequest'
+        '401':
+          $ref: '#/components/responses/Unauthenticated'
+        '404':
+          $ref: '#/components/responses/NotFound'
+    delete:
+      tags:
+        - Admin endpoints
+      description: Delete an lot
+      responses:
+        '204':
+          description: Successful operation
+        '401':
+          $ref: '#/components/responses/Unauthenticated'
+        '404':
+          $ref: '#/components/responses/NotFound'
+  /lot/{paymentID}/close:
+    parameters:
+      - name: paymentID
+        description: Payment ID
+        in: path
+        required: true
+        schema:
+          type: string
+    post:
+      tags:
+        - Admin endpoints
+      description: Close a lot
+      responses:
+        '204':
+          description: Successful operation
+        '401':
+          $ref: '#/components/responses/Unauthenticated'
+        '404':
+          $ref: '#/components/responses/NotFound'
+  /lot/{lotID}/reserve:
+    parameters:
+      - name: lotID
+        description: lot ID
+        in: path
+        required: true
+        schema:
+          type: string
+    post:
+      tags:
+        - Admin endpoints
+      description: Close a lot
+      responses:
+        '204':
+          description: Successful operation
+        '401':
+          $ref: '#/components/responses/Unauthenticated'
+        '404':
+          $ref: '#/components/responses/NotFound'
+  /lot/{lotID}/winner:
+    parameters:
+      - name: lotID
+        description: lot ID
+        in: path
+        required: true
+        schema:
+          type: string
+    get:
+      tags:
+        - Admin endpoints
+      description: Get an lot
+      responses:
+        '200':
+          description: Successful operation
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  id:
+                    type: string
+                    readOnly: true
+                    example: 507f1f77bcf86cd799439011
+                  firstName:
+                    type: string
+                    readOnly: true
+                    example: John
+                  lastName:
+                    type: string
+                    readOnly: true
+                    example: Dou
+                  email:
+                    type: string
+                    readOnly: true
+                    format: email
+                    example: john.dou@example.com
+        '401':
+          $ref: '#/components/responses/Unauthenticated'
+        '404':
+          $ref: '#/components/responses/NotFound'
+  /user/{userID}/lot/{lotID}/bid:
+    parameters:
+      - name: userID
+        description: User ID
+        in: path
+        required: true
+        schema:
+          type: string
+      - name: lotID
+        description: lot ID
+        in: path
+        required: true
+        schema:
+          type: string
+    post:
+      tags:
+        - Bidder endpoints
+      description: Bid for a lot
+      requestBody:
+        description: lot to create
+        content:
+          application/json:
+            schema:
+              type: object
+              required:
+                - bid
+              properties:
+                bid:
+                  type: number
+                  example: 10.50
+      responses:
+        '204':
+          description: Successful operation
+        '401':
+          $ref: '#/components/responses/Unauthenticated'
+        '404':
+          $ref: '#/components/responses/NotFound'
+  /user/{userID}/lot/{lotID}/purchase:
+    parameters:
+      - name: userID
+        description: User ID
+        in: path
+        required: true
+        schema:
+          type: string
+      - name: lotID
+        description: lot ID
+        in: path
+        required: true
+        schema:
+          type: string
+    post:
+      tags:
+        - Bidder endpoints
+      description: Purchase a lot
+      responses:
+        '204':
+          description: Successful operation
+        '401':
+          $ref: '#/components/responses/Unauthenticated'
+        '404':
+          $ref: '#/components/responses/NotFound'
+components:
+  schemas:
+    Lot:
+      required:
+        - name
+        - startingPrice
+        - currencyCode
+      type: object
+      properties:
+        id:
+          type: string
+          readOnly: true
+          example: 507f1f77bcf86cd799439011
+        name:
+          type: string
+          example: A very expensive painting
+        startingPrice:
+          type: number
+          example: 10.50
+        actualPrice:
+          type: number
+          readOnly: true
+          example: 12.30
+        currencyCode:
+          type: string
+          enum:
+            - USD
+        status:
+          type: string
+          readOnly: true
+          enum:
+            - open
+            - reserved
+            - closed
+        winnerId:
+          type: string
+          readOnly: true
+          example: ''
+        lastBidderId:
+          type: string
+          readOnly: true
+          example: ''
+        paymentId:
+          type: string
+          readOnly: true
+          example: ''
+    Error:
+      type: object
+      properties:
+        error:
+          type: string
+  responses:
+    Success:
+      description: Successful operation
+      content:
+        application/json:
+          schema:
+            $ref: '#/components/schemas/Lot'
+    BadRequest:
+      description: Bad Request
+      content:
+        application/json:
+          schema:
+            $ref: '#/components/schemas/Error'
+    NotFound:
+      description: Not Found
+      content:
+        application/json:
+          schema:
+            $ref: '#/components/schemas/Error'
+    Unauthenticated:
+      description: Unauthenticated
+      content:
+        application/json:
+          schema:
+            $ref: '#/components/schemas/Error'
+  securitySchemes:
+    Oauth:
+      type: oauth2
+      description: API uses OAuth 2.0 with the client credentials grant flow.
+      flows:
+        clientCredentials:
+          tokenUrl: https://testtesttestm2m.auth.us-east-2.amazoncognito.com/oauth2/token
+          scopes: {}

@@ -1,0 +1,156 @@
+openapi: 3.0.3
+info:
+  title: Swagger User API
+  description: User API
+  version: 1.0.0
+security:
+  - Oauth: []
+paths:
+  /user:
+    post:
+      tags:
+        - User
+      description: Create a new user
+      requestBody:
+        description: User to create
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/User'
+        required: true
+      responses:
+        '200':
+          $ref: '#/components/responses/Success'
+        '401':
+          $ref: '#/components/responses/Unauthenticated'
+        '400':
+          $ref: '#/components/responses/BadRequest'
+  /user/{id}:
+    parameters:
+      - name: id
+        description: User ID
+        in: path
+        required: true
+        schema:
+          type: string
+    get:
+      tags:
+        - User
+      description: Get a user
+      responses:
+        '200':
+          $ref: '#/components/responses/Success'
+        '401':
+          $ref: '#/components/responses/Unauthenticated'
+        '404':
+          $ref: '#/components/responses/NotFound'
+    put:
+      tags:
+        - User
+      description: Get a user
+      requestBody:
+        description: User to update
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/User'
+        required: true
+      responses:
+        '200':
+          $ref: '#/components/responses/Success'
+        '400':
+          $ref: '#/components/responses/BadRequest'
+        '401':
+          $ref: '#/components/responses/Unauthenticated'
+        '404':
+          $ref: '#/components/responses/NotFound'
+    delete:
+      tags:
+        - User
+      description: Delete a user
+      responses:
+        '204':
+          description: Successful operation
+        '401':
+          $ref: '#/components/responses/Unauthenticated'
+        '404':
+          $ref: '#/components/responses/NotFound'
+  /users:
+    get:
+      tags:
+        - User
+      description: Get all users
+      responses:
+        '200':
+          description: Successful operation
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: '#/components/schemas/User'
+        '401':
+          $ref: '#/components/responses/Unauthenticated'
+        '404':
+          $ref: '#/components/responses/NotFound'
+components:
+  schemas:
+    User:
+      required:
+        - firstName
+        - lastName
+        - email
+      type: object
+      properties:
+        id:
+          type: string
+          example: 507f1f77bcf86cd799439011
+          readOnly: true
+        firstName:
+          type: string
+          example: John
+        lastName:
+          type: string
+          example: Dou
+        email:
+          type: string
+          format: email
+          example: john.dou@example.com
+    Error:
+      type: object
+      properties:
+        error:
+          type: string
+  responses:
+    Success:
+      description: Successful operation
+      content:
+        application/json:
+          schema:
+            $ref: '#/components/schemas/User'
+    BadRequest:
+      description: Bad Request
+      content:
+        application/json:
+          schema:
+            $ref: '#/components/schemas/Error'
+    NotFound:
+      description: Not Found
+      content:
+        application/json:
+          schema:
+            $ref: '#/components/schemas/Error'
+    Unauthenticated:
+      description: Unauthenticated
+      content:
+        application/json:
+          schema:
+            $ref: '#/components/schemas/Error'
+  securitySchemes:
+    Oauth:
+      type: oauth2
+      description: API uses OAuth 2.0 with the client credentials grant flow.
+      flows:
+        clientCredentials:
+          tokenUrl: https://testtesttestm2m.auth.us-east-2.amazoncognito.com/oauth2/token
+          scopes: {}
