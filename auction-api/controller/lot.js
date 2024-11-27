@@ -17,7 +17,7 @@ const getUser = async (userID, token) => {
       },
     });
     if (res.status !== 200) {
-      return null;
+      throw new Error("User API responded with status: "+res.status);
     }
     return await res.json()
 }

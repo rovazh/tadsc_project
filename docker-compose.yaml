@@ -27,6 +27,8 @@ services:
       PAYMENT_API_BASE_URL: http://payment-api:3002
     depends_on:
       - db
+      - user-api
+      - payment-api
     ports:
       - "3001:3001"
   payment-api:
